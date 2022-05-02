@@ -1,0 +1,6 @@
+numpy==1.22.3
+pandas==1.4.2
+pyaml_env==1.1.5
+scipy==1.8.0
+matplotlib==3.5.1
+pyarrow==7.0.0

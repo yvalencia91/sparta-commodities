@@ -1,0 +1,23 @@
+file:
+  path: ${ROOT_PATH}/raw_data
+  name: ${FILE_NAME}
+  supported:
+    - csv
+    - parquet
+
+  data:
+    structure:
+      generated_on: datetime64[ns]
+      display_name: object
+      load_month: datetime64[ns]
+      dlvd_price: float64
+
+    outliers:
+      - z_score
+
+  output:
+    path: ${ROOT_PATH}
+    extension: ${OUTPUT_EXTENSION}
+
+logger:
+  level: INFO

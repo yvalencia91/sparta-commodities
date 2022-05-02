@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  transform:
+    image: sparta-candidate:1.0
+    volumes:
+      - ./raw_data:/usr/src/app/raw_data
+      - ./no_valid_data:/usr/src/app/no_valid_data
+      - ./img:/usr/src/app/img
+      - ./data:/usr/src/app/data
+    environment:
+      - FILE_NAME=RBOB_data_test.xlsx
+#      - OUTPUT_EXTENSION=csv
