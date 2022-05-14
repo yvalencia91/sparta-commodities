@@ -1,5 +1,7 @@
 from logging import getLogger
-from settings import config, file_extension_factory
+from typing import Dict
+
+from settings import config, ColumnPosition
 from src.libs.logger import setup_logger
 from src.utils.errors import FileValidationError, MissingMandatoryColumns
 from src.utils.validator import SolverFormatProblem
@@ -10,41 +12,21 @@ setup_logger(config)
 log = getLogger(__name__)
 
 
-def main():
-    s = SolverFormatProblem(config=config)
+def main(params: Dict):
 
     try:
-        is_supported = s.supported_extension()
+        solver = SolverFormatProblem(**params)
+        df_pivot = solver.df.pivot_table(solver.pos.y_axis['column'], solver.pos.x_axis['column'], solver.pos.label['column'])
 
-        if is_supported:
-            full_path = f"{s.file_path}/{s.file_name}"
-            file_parser = file_extension_factory(file_suffix=s.file_suffix)
-            s.df = file_parser.read(file_path=full_path)
-            s.raw_data_structure = s.df.dtypes.apply(lambda x: x.name).to_dict()
+        log.info(f"Removing outliers using {config.file['data']['outliers'][0]} strategy")
 
-            v1 = s.check_for_mandatory_columns()
-            v2 = s.check_for_datetime_iso8601()
-            v3 = s.check_for_rbob_only()
-            v4 = s.check_for_month_year_structure()
-            v5 = s.check_for_delivery_price()
-            v6 = s.check_for_null_values()
+        clean_data = OutlierStrategy()
+        clean_data(strategy=ZScore(), df=df_pivot)
 
-            if v1 and v2 and v3 and v4 and v5 and v6:
-                log.info("Dataframe is ready to be processed")
-                df_pivot = s.df.pivot_table("dlvd_price", "generated_on", "load_month")
-
-                log.info(f"Removing outliers using {config.file['data']['outliers'][0]} strategy")
-
-                clean_data = OutlierStrategy(ZScore())
-                clean_data.strategy.run(df_pivot)
-
-                log.info("Outlier removed correctly an image has been produced.")
-            else:
-                log.warning("One of the validators return False")
+        log.info("Outlier removed correctly an image has been produced.")
 
     except FileValidationError:
-        log.error(f"File path: {s.file_path}")
-        log.error(f"Currently we are not supporting this type of file: {s.file_suffix}")
+        log.error(f"Currently we are not supporting this type of file")
 
     except MissingMandatoryColumns as m:
         log.error(m)
@@ -54,4 +36,13 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    values = {
+        "full_path": f"{config.file['path']}/{config.file['name']}",
+        "output_path": config.file['output']['path'],
+        "extensions": config.file['supported']
+
+    }
+
+    main(params=values)
+

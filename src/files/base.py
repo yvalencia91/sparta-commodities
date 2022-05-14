@@ -4,6 +4,6 @@ import pandas as pd
 
 class IFileExtension(Protocol):
 
-    def read(self, file_path: str) -> pd.DataFrame:
+    def __call__(self, file_path: str) -> pd.DataFrame:
         ...
 

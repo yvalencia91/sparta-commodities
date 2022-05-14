@@ -7,10 +7,19 @@ file:
 
   data:
     structure:
-      generated_on: datetime64[ns]
-      display_name: object
-      load_month: datetime64[ns]
-      dlvd_price: float64
+      - position: x_axis
+        column: generated_on
+        type: datetime64[ns]
+      - position: y_axis
+        column: blend_cost_diff #dlvd_price
+        type: float64
+      - position: label
+        column: load_month
+        type: datetime64[ns]
+      - position: others
+        column: display_name
+        type: object
+        value: RBOB
 
     outliers:
       - z_score

@@ -11,4 +11,6 @@ class IOutlierFinder(Protocol):
 
 @dataclass
 class OutlierStrategy:
-    strategy: IOutlierFinder
+
+    def __call__(self, strategy: IOutlierFinder, df: pd.DataFrame):
+        strategy.run(df)
